@@ -1,13 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for
 
-
 app = Flask(__name__)
 
 user_data = {
-    "username" : "Perusahaan ABC",
-    "nama_perusahaan": "Perusahaan ABC",
-    "idPerusahaan": "123",
-    "password": "password"
+    "Perusahaan ABC": {
+        "username": "Perusahaan ABC",
+        "idPerusahaan": "123",
+        "password": "password"
+    }
 }
 
 @app.route('/')
@@ -19,12 +19,23 @@ def authenticate():
     nama_perusahaan = request.form['nama_perusahaan']
     idPerusahaan = request.form['idPerusahaan']
     password = request.form['password']
-    if nama_perusahaan == user_data['nama_perusahaan'] and idPerusahaan == user_data['idPerusahaan'] and password == user_data['password']:
-        return redirect(url_for('dashboard'))
-    else: 
-        return redirect(url_for('login'))
     
-@app.route ('/dashboard')
+    if nama_perusahaan in user_data:
+        company_data = user_data[nama_perusahaan]
+        if idPerusahaan == company_data['idPerusahaan'] and password == company_data['password']:
+            return redirect(url_for('dashboard'))
+    
+    return redirect(url_for('signup_failed'))
+
+@app.route('/signup_failed')
+def signup_failed():
+    return render_template('signup_failed.html')
+
+@app.route('/try_again', methods=['POST'])
+def try_again():
+    return redirect(url_for('login'))
+
+@app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
 
